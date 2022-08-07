@@ -34,10 +34,16 @@ int main(int argc, char* argv[]) {
 
     SendRequest(handle,MY_IP,MY_MAC,SENDER_IP,SENDER_MAC);
     SendInfect(handle,MY_MAC,SENDER_IP,SENDER_MAC,GATEWAY_IP);
-
-    PrintIP(ntohl(MY_IP));
-    PrintMAC(SENDER_MAC);
-
+    printf("My Linux on VM\n");
+    printf("---------------------------------\n");
+    PrintIP("My VM IP", ntohl(MY_IP));
+    printf("---------------------------------\n\n");
+    printf("Sender Info\n");
+    printf("---------------------------------\n");
+    PrintIP("Sender IP", ntohl(SENDER_IP));
+    printf("---------------------------------\n");
+    PrintMAC("Sender MAC", SENDER_MAC);
+    printf("---------------------------------\n");
     pcap_close(handle);
 }
 
