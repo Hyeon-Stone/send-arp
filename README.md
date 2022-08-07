@@ -18,7 +18,7 @@ ex) ./send-arp wlan0 172.20.10.3 172,20,10,1
 
 ---
 ## Result
-![image](https://user-images.githubusercontent.com/79035672/183304075-c5c9e0bc-c4e9-4237-908c-fe2ca80cd5b7.png)
+![image](https://user-images.githubusercontent.com/79035672/183304512-179ab12f-9de9-4a62-8588-14d6bf56b43e.png)
 
 ---
 | BoB11 Hyeon Seak hun
