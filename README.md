@@ -2,9 +2,9 @@
 
 | Sender : Victim IP (Not Always)<br>
 | Target : Gateway IP<br>
-| 나의 MAC 주소 가져오기<br>
-| Sender IP에 ARP Request을 보내 MAC 주소 GET<br>
-| Sender에게 ARP Reply를 통해 Sender의 ARP-Table 조작
+1. 나의 MAC 주소 가져오기<br>
+2. Sender IP에 ARP Request을 보내 MAC 주소 GET<br>
+3. Sender에게 ARP Reply를 통해 Sender의 ARP-Table 조작
 
 ---
 ## Execute
