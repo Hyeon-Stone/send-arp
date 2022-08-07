@@ -51,9 +51,9 @@ typedef struct{
 }EthArpPacket;
 #pragma pack(pop)
 
-void PrintMAC(uint8_t *mac);
+void PrintMAC(char* msg, uint8_t *mac);
 
-void PrintIP(uint32_t ip);
+void PrintIP(char* msg, uint32_t ip);
 
 uint32_t Str2A(char *ip_string);
 

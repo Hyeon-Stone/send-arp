@@ -8,20 +8,16 @@
 #include <net/if.h>
 #include "hdr.h"
 
-void PrintMAC(uint8_t *mac){
-    printf("-------------------------------\n");
-    printf("Sender MAC | %02x:%02x:%02x:%02x:%02x:%02x |\n", mac[0], mac[1],mac[2],mac[3],mac[4],mac[5]);
-    printf("-------------------------------\n");
+void PrintMAC(char* msg, uint8_t *mac){
+    printf("| %s | %02x:%02x:%02x:%02x:%02x:%02x |\n", msg, mac[0], mac[1],mac[2],mac[3],mac[4],mac[5]);
 }
 
-void PrintIP(uint32_t ip){
+void PrintIP(char* msg, uint32_t ip){
 //    printf("%s",inet_ntop(IP_version, ip_pointer, buf_pointer, buf_size));
-    printf("-------------------------------\n");
-    printf("Sender IP  | %3d.%3d.%3d.%3d   |\n", ip&0xFF, (ip>>8)&0xFF, (ip>>16)&0xFF, (ip>>24)&0xFF);
+    printf("| %s  | %3d.%3d.%3d.%3d   |\n", msg, ip&0xFF, (ip>>8)&0xFF, (ip>>16)&0xFF, (ip>>24)&0xFF);
 }
 
 uint32_t Str2A(char *ip_string){
-
     unsigned int a, b, c, d;
 
     sscanf(ip_string,"%u.%u.%u.%u", &a, &b, &c, &d);
@@ -29,7 +25,6 @@ uint32_t Str2A(char *ip_string){
 }
 
 uint32_t GetMyIp(char *dev){
-
     struct ifreq ifr;
     char ipstr[40];
     int s;
@@ -44,7 +39,6 @@ uint32_t GetMyIp(char *dev){
 }
 
 void GetMyMac(char* dev, uint8_t *mac){
-
     struct ifreq ifr;
     int s;
 
