@@ -10,7 +10,7 @@
 ## Execute
 ```
 comandline : ./send-arp <interface> <sender ip> <target ip>
-ex) ./send-arp wlan0 172.20.10.3 172,20,10,1
+ex) ./send-arp wlan0 172.20.10.3 172.20.10.1
 ```
 ---
 ### Check Infect another Computer
