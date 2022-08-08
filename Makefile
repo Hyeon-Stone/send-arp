@@ -1,10 +1,16 @@
 LDLIBS=-lpcap
 
-all : send-arp
+all: send-arp
 
-send-arp: main.o arphdr.h arphdr.cpp  ethhdr.h ethhdr.cpp  send.h send.cpp
+arphdr.o: arphdr.h arphdr.cpp
+
+ethhdr.o: ethhdr.h ethhdr.cpp
+
+send.o: ethhdr.h arphdr.h send.h send.cpp
+
+send-arp: main.o arphdr.o ethhdr.o send.o
 	$(LINK.cc) $^ $(LOADLIBES) $(LDLIBS) -o $@
-
-clean:
 	rm -f *.o
+clean:
+	rm -f send-arp-test *.o
 
