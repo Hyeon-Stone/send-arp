@@ -20,7 +20,7 @@ _*VM에 있던 MAC이 HOST PC를 통해 나가기 때문에 Sender PC의 게이�
 
 ---
 ## Result
-![image](https://user-images.githubusercontent.com/79035672/183304512-179ab12f-9de9-4a62-8588-14d6bf56b43e.png)
+![image](https://user-images.githubusercontent.com/79035672/183365465-4bf8f2be-1cbc-4148-b59a-7cb6f94d2faf.png)
 
 ---
 | BoB11 Hyeon Seak hun
