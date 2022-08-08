@@ -4,7 +4,7 @@
 #include <net/if.h>
 #include <arpa/inet.h>
 #include <cstdio>
-#include "hdr.h"
+#include "send.h"
 
 void usage() {
     printf("syntax: send-arp <interface> <sender ip> <target ip>\n");
@@ -46,4 +46,3 @@ int main(int argc, char* argv[]) {
     printf("---------------------------------\n");
     pcap_close(handle);
 }
-
