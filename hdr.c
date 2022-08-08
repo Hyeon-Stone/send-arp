@@ -52,18 +52,16 @@ void GetMyMac(char* dev, uint8_t *mac){
 
 EthArpPacket MakeArpRequest(uint32_t source_ip, uint8_t* source_mac, uint32_t target_ip){
     EthArpPacket ARP;
-    static int ETH_TYPE = 0x0806;
-    static int ARP_REQUEST = 1;
 
     memset(ARP.eth_.Dst_mac, 0xFF, 6);
     memcpy(ARP.eth_.Src_mac,source_mac,sizeof(uint8_t)*6);
-    ARP.eth_.type = htons(ETH_TYPE);
+    ARP.eth_.type = htons(Arp);
 
-    ARP.arp_.Hw_type = htons(0x0001);
-    ARP.arp_.Proto_type = htons(0x0800);
+    ARP.arp_.Hw_type = htons(ETHER);
+    ARP.arp_.Proto_type = htons(Ip4);
     ARP.arp_.Hw_addr_len = 0x06;
     ARP.arp_.Proto_addr_len = 0x04;
-    ARP.arp_.Opcode = htons(ARP_REQUEST);
+    ARP.arp_.Opcode = htons(REQUEST);
 
     memcpy(ARP.arp_.Src_mac,source_mac,sizeof(uint8_t)*6);
     ARP.arp_.Src_ip = htonl(source_ip);
@@ -76,17 +74,16 @@ EthArpPacket MakeArpRequest(uint32_t source_ip, uint8_t* source_mac, uint32_t ta
 
 EthArpPacket MakeArpInfect(uint32_t gateway_ip, uint8_t* source_mac, uint32_t target_ip, uint8_t* target_mac){
     EthArpPacket ARP;
-    static int ETH_TYPE = 0x0806;
-    static int ARP_REPLY = 2;
+
     memcpy(ARP.eth_.Dst_mac,target_mac,sizeof(uint8_t)*6);
     memcpy(ARP.eth_.Src_mac,source_mac,sizeof(uint8_t)*6);
-    ARP.eth_.type = htons(ETH_TYPE);
+    ARP.eth_.type = htons(Arp);
 
-    ARP.arp_.Hw_type = htons(0x0001);
-    ARP.arp_.Proto_type = htons(0x0800);
+    ARP.arp_.Hw_type = htons(ETHER);
+    ARP.arp_.Proto_type = htons(Ip4);
     ARP.arp_.Hw_addr_len = 0x06;
     ARP.arp_.Proto_addr_len = 0x04;
-    ARP.arp_.Opcode = htons(ARP_REPLY);
+    ARP.arp_.Opcode = htons(REPLY);
 
     memcpy(ARP.arp_.Src_mac,source_mac,sizeof(uint8_t)*6);
     ARP.arp_.Src_ip = htonl(gateway_ip);
@@ -99,8 +96,6 @@ EthArpPacket MakeArpInfect(uint32_t gateway_ip, uint8_t* source_mac, uint32_t ta
 void CapArpReply(pcap_t* handle, uint32_t target_ip, uint8_t* target_mac){
     struct pcap_pkthdr* header;
     const u_char* data;
-    static int ETH_TYPE = 0x0806;
-    static int ARP_REPLY = 2;
     while(1){
         int res = pcap_next_ex(handle, &header, &data);
         if(res == 0) continue;
@@ -110,8 +105,8 @@ void CapArpReply(pcap_t* handle, uint32_t target_ip, uint8_t* target_mac){
 
         EthArpPacket* capture = (EthArpPacket*)data;
 
-        if(ntohs(capture->eth_.type) == ETH_TYPE){
-            if(ntohs(capture->arp_.Opcode) == ARP_REPLY){
+        if(ntohs(capture->eth_.type) == Arp){
+            if(ntohs(capture->arp_.Opcode) == REPLY){
                 if(ntohl(capture->arp_.Src_ip) == target_ip){
                     memcpy(target_mac,capture->arp_.Src_mac,sizeof(uint8_t)*6);
                     break;
