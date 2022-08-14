@@ -7,15 +7,16 @@
 #include "send.h"
 
 void usage() {
-    printf("syntax: send-arp <interface> <sender ip> <target ip>\n");
+    printf("syntax: send-arp <interface> <sender ip> <target ip> [<sender ip 2> <target ip 2> ...]\n");
     printf("sample: send-arp wlan0 172.20.10.3 172,20,10,1\n");
 }
 
 int main(int argc, char* argv[]) {
-    if (argc != 4) {
+    if (argc < 4) {
         usage();
         return -1;
     }
+    int pair_ST = 2;
 
     char* dev = argv[1];
     char errbuf[PCAP_ERRBUF_SIZE];
@@ -24,25 +25,27 @@ int main(int argc, char* argv[]) {
         fprintf(stderr, "couldn't open device %s(%s)\n", dev, errbuf);
         return -1;
     }
+    while(argc > pair_ST){
+        uint8_t MY_MAC[6];
+        uint8_t SENDER_MAC[6];
+        uint32_t SENDER_IP = Str2A(argv[pair_ST]);
+        uint32_t GATEWAY_IP = Str2A(argv[pair_ST+1]);
+        uint32_t MY_IP = GetMyIp(dev);
+        GetMyMac(dev,MY_MAC);
 
-    uint8_t MY_MAC[6];
-    uint8_t SENDER_MAC[6];
-    uint32_t SENDER_IP = Str2A(argv[2]);
-    uint32_t GATEWAY_IP = Str2A(argv[3]);
-    uint32_t MY_IP = GetMyIp(dev);
-    GetMyMac(dev,MY_MAC);
-
-    SendRequest(handle,MY_IP,MY_MAC,SENDER_IP,SENDER_MAC);
-    SendInfect(handle,MY_MAC,SENDER_IP,SENDER_MAC,GATEWAY_IP);
-    printf("My Linux on VM\n");
-    printf("---------------------------------\n");
-    PrintIP("My VM IP", ntohl(MY_IP));
-    printf("---------------------------------\n\n");
-    printf("Sender Info\n");
-    printf("---------------------------------\n");
-    PrintIP("Sender IP", ntohl(SENDER_IP));
-    printf("---------------------------------\n");
-    PrintMAC("Sender MAC", SENDER_MAC);
-    printf("---------------------------------\n");
+        SendRequest(handle,MY_IP,MY_MAC,SENDER_IP,SENDER_MAC);
+        SendInfect(handle,MY_MAC,SENDER_IP,SENDER_MAC,GATEWAY_IP);
+        printf("My Linux on VM\n");
+        printf("---------------------------------\n");
+        PrintIP("My VM IP", ntohl(MY_IP));
+        printf("---------------------------------\n\n");
+        printf("Sender Info\n");
+        printf("---------------------------------\n");
+        PrintIP("Sender IP", ntohl(SENDER_IP));
+        printf("---------------------------------\n");
+        PrintMAC("Sender MAC", SENDER_MAC);
+        printf("---------------------------------\n");
+        pair_ST += 2;
+    }
     pcap_close(handle);
 }
